@@ -1,0 +1,10 @@
+This folder contains functions of the form
+inWindowNx1 = RefractiveIndxFcn(IntersectPointsNx3)
+
+Inputs: IntersectPointsNx3
+Outputs: inWindowNx1
+
+
+IntersectPointsNx3 is an Nx3 array of (x,y,z) spatial points (that have supposedly intersected a surface)
+
+inWindowNx1 is an Nx1 logical array specifying whether the spatial points fall within the window area specified by this function

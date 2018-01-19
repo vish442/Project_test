@@ -1,0 +1,9 @@
+This folder contains functions of the form
+RefractiveIndicesNx1 = RefractiveIndxFcn(aRaysetO)
+
+Inputs: aRaysetO
+Outputs: RefractiveIndicesNx1
+
+
+aRaysetO is a RaysetO object.
+RefractiveIndicesNx1 is an Nx1 array of refractive indices that the N rays in aRaysetO would encounter upon entering the space that invokes the RefractiveIndxFcn

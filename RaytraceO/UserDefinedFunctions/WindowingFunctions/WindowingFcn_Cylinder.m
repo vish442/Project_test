@@ -1,0 +1,5 @@
+function inWindow = WindowingFcn_Cylinder(SpatialPointsNx3,CylinderAxisPoint1x3,CylinderDirectionVector1x3,CylinderRadius)
+normedCylinderDirectionVector1x3=CylinderDirectionVector1x3/norm(CylinderDirectionVector1x3);
+%use the magnitude of the cross product between  normedCylinderDirectionVector1x3  and  (SpatialPointsNx3-CylinderAxisPoint1x3)
+inWindow=((normedCylinderDirectionVector1x3(2)*(SpatialPointsNx3(:,1)-CylinderAxisPoint1x3(1)) - normedCylinderDirectionVector1x3(1)*(SpatialPointsNx3(:,2)-CylinderAxisPoint1x3(2))).^2 + (normedCylinderDirectionVector1x3(3)*(SpatialPointsNx3(:,1)-CylinderAxisPoint1x3(1)) - normedCylinderDirectionVector1x3(1)*(SpatialPointsNx3(:,3)-CylinderAxisPoint1x3(3))).^2 + (normedCylinderDirectionVector1x3(3)*(SpatialPointsNx3(:,2)-CylinderAxisPoint1x3(2)) - normedCylinderDirectionVector1x3(2)*(SpatialPointsNx3(:,3)-CylinderAxisPoint1x3(3))).^2)<CylinderRadius^2;
+end
