@@ -70,3 +70,4 @@ figure (3)
 viewArray(projArray,'ShowNormals',true);
 pattern(projArray,fc,-180:180,0,'CoordinateSystem','polar','Type','powerdb',...
       'PropagationSpeed',Speed);
+  a=4
