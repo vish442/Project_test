@@ -18,8 +18,7 @@ ycorr='Please enter the y cordinate of the receiver';
 ycorr=input(ycorr);
 zcorr='Please enter the z cordinate of the receiver';
 zcorr=input(zcorr);
-Speed='What is your propagation speed?';
-Speed=input(Speed);
+
 Speed=1 %m/s propgation speed
 isopath{1} = phased.IsoSpeedUnderwaterPaths(...
           'ChannelDepth',channelDepth,...
@@ -66,9 +65,7 @@ fs = 2*pulseBandwidth;
 wav = phased.RectangularWaveform('PRF',prf,'PulseWidth',pulseWidth,...
   'SampleRate',fs);
 channel.SampleRate = fs;
-x = wav();
-plot(real(x)); title('Waveform output, real part');
-xlabel('Samples'); ylabel('Amplitude (V)');
+
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
     'FrequencyRange',[0 30e3],'VoltageResponse',80,'BackBaffled',false);
 
