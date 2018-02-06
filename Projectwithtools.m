@@ -72,7 +72,7 @@ plot(wav); title('Waveform output, real part');
 xlabel('Samples'); ylabel('Amplitude (V)');
 
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-    'FrequencyRange',[0 30e3],'VoltageResponse',80,'BackBaffled',false);
+    'FrequencyRange',[0 1000],'VoltageResponse',80,'BackBaffled',false);
 
 projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
@@ -80,8 +80,8 @@ projRadiator = phased.Radiator('Sensor',projector,...                   %radiate
 ProjectorPlatform = phased.Platform('InitialPosition',[A(1); A(2); -A(3)],...   % set a platform for the sound projector
   'Velocity',[0; 0; 0]);
 
-hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 30e3],...
-    'VoltageSensitivity',-100);
+hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 1000],...
+    'VoltageSensitivity',-200);
 array = phased.ULA('Element',hydrophone,...
   'NumElements',2,'ElementSpacing',Speed/fc/2,...
   'ArrayAxis','y');
