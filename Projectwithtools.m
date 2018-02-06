@@ -80,7 +80,8 @@ projRadiator = phased.Radiator('Sensor',projector,...                   %radiate
 ProjectorPlatform = phased.Platform('InitialPosition',[A(1); A(2); -A(3)],...   % set a platform for the sound projector
   'Velocity',[0; 0; 0]);
 
-hydrophone = phased.IsotropicHydrophone('VoltageSensitivity',-150);
+hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 30e3],...
+    'VoltageSensitivity',-100);
 array = phased.ULA('Element',hydrophone,...
   'NumElements',2,'ElementSpacing',Speed/fc/2,...
   'ArrayAxis','y');
