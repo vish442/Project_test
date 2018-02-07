@@ -1,4 +1,4 @@
-% clf
+clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
@@ -67,7 +67,9 @@ wav = phased.RectangularWaveform('PRF',prf,'PulseWidth',pulseWidth,...
   'SampleRate',fs);
 channel.SampleRate = fs;
 
-
+figure(3);
+plot(wav); title('Waveform output, real part');
+xlabel('Samples'); ylabel('Amplitude (V)');
 
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
     'FrequencyRange',[0 1000],'VoltageResponse',80,'BackBaffled',false);
@@ -78,38 +80,34 @@ patternAzimuth(projector,fc);
 projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
-%takes only the last value of the coordinate at the moment
-beaconPlat = phased.Platform('InitialPosition',[A(1); A(2); -A(3)],...   % set a platform for the sound projector
+ProjectorPlatform = phased.Platform('InitialPosition',[A(1); A(2); -A(3)],...   % set a platform for the sound projector
   'Velocity',[0; 0; 0]);
 
 hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 1000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
     'VoltageSensitivity',-200);
 
 array = phased.ULA('Element',hydrophone,...                             %   This object models a ULA formed with identical sensor elements.
-  'NumElements',5,'ElementSpacing',Speed/fc/2,...
+  'NumElements',2,'ElementSpacing',Speed/fc/2,...
   'ArrayAxis','y');
 
-arrayCollector = phased.Collector('Sensor',array,...                    %collects incident narrowband signals from given directions 
+arrayCollector = phased.Collector('Sensor',array,...
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
-arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -xcorr],...
+HydrophonePlatform = phased.Platform('InitialPosition',[xcorr; ycorr; -xcorr],...
   'Velocity',[0; 0; 0]);
 
-rx = phased.ReceiverPreamp(...                                          %Amplifiy weak signals to easier processing
+rx = phased.ReceiverPreamp(...
     'Gain',20,...
     'SampleRate',fs)
 
-x = wav();  
-figure(3);
-plot(wav); title('Waveform output, real part');
-xlabel('Samples'); ylabel('Amplitude (V)');                                                %Transmit 10 pings, pings appear as a peak in the received signals
+x = wav();                                                  %Transmit 10 pings, pings appear as a peak in the received signals
 numTransmits = 10;
 rxsig = zeros(size(x,1),5,numTransmits);
 for i = 1:numTransmits
 
   % Update array and acoustic beacon positions
-  [pos_tx,vel_tx] = beaconPlat(1/prf);
-  [pos_rx,vel_rx] = arrayPlat(1/prf);
+  [pos_tx,vel_tx] = ProjectorPlatform(1/prf);
+  [pos_rx,vel_rx] = HydrophonePlatform (1/prf);
 
   % Compute paths between the acoustic beacon and array
   [paths,dop,aloss,rcvang,srcang] = ...
@@ -118,13 +116,13 @@ for i = 1:numTransmits
   % Propagate the acoustic beacon waveform
   tsig = projRadiator(x,srcang);
   rsig = channel(tsig,paths,dop,aloss);
-  
+
   % Collect the propagated signal
   rsig = arrayCollector(rsig,rcvang);
-  
+
   % Store the received pulses
   rxsig(:,:,i) = abs(rx(rsig));
- 
+
 end
 figure(4)
 t = (0:length(x)-1)'/fs;
