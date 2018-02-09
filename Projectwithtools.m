@@ -1,25 +1,21 @@
-% clf
+clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth ='What is the depth from the surface to the bottom of the ocean? ';
-channelDepth =input(channelDepth);
-Numberofsourcepaths ='How many number of source paths do you wish to have? ';
-Numberofsourcepaths =input(Numberofsourcepaths);
-BottomLoss='What is the loss in dB for the bottom surface reflection?';
-BottomLoss=input(BottomLoss);
-LossFrequencies='In Hertz what is is your absorption loss?';
-LossFrequencies=input(LossFrequencies);
+channelDepth =1000
+Numberofsourcepaths =1
+BottomLoss=0.5
+LossFrequencies=1:1000
 TxPos='Input matrix in standard MATLAB format such as [50 50 100;50 50 600;50 50 200]: '
-TxPos=input(TxPos)
-xcorr='Please enter the x cordinate of the receiver';
-xcorr=input(xcorr);
-ycorr='Please enter the y cordinate of the receiver';
-ycorr=input(ycorr);
-zcorr='Please enter the z cordinate of the receiver';
-zcorr=input(zcorr);
+TxPos=[50 50 100;50 50 600;50 50 200]
+% xcorr='Please enter the x cordinate of the receiver';
+xcorr=900
+% ycorr='Please enter the y cordinate of the receiver';
+ycorr=900
+% zcorr='Please enter the z cordinate of the receiver';
+zcorr=900
 Speed='What is your propagation speed?';
-Speed=input(Speed);
+Speed=1500
 isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a  channel for the propagation 
           'ChannelDepth',channelDepth,...
           'NumPathsSource',...                  %
@@ -31,22 +27,22 @@ isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a  channel for the propa
           'LossFrequencies',LossFrequencies);   %   number of paths based on spreading and reflection losses. When
  channel = phased.MultipathChannel(...
           'OperatingFrequency',fc);                                                
-    length(TxPos)                                      
-    ValueofA=cell(length(TxPos),1);                                            
-    figure (1)    
-    hold on %   are ignored and not plotted     
- for k=1:length(TxPos)  %for loop for each point of the transmitter
-  A=TxPos(k,:)    
-  [paths,dop,aloss] = isopath([A(1); A(2); -A(3)],[xcorr;ycorr;-zcorr],... %coordinates for transmitter and reciever,and velocity of transmitter and reciever
-  [0;0;0],[0;0;0],1); 
-  ValueofA{k}=aloss
-%   data=ValueofA{k}
-%   fnm=sprintf('file_%d.csv',k)
-%   save(fnm,'data')       
-  plot(1:Numberofsourcepaths,paths(1,:))
-  xlabel('Path Index')
-  ylabel('Delay Time (s)')                                          
-  end
+%     length(TxPos)                                      
+%     ValueofA=cell(length(TxPos),1);                                            
+%     figure (1)    
+%     hold on %   are ignored and not plotted     
+%  for k=1:length(TxPos)  %for loop for each point of the transmitter
+%   A=TxPos(k,:)    
+%   [paths,dop,aloss] = isopath([A(1); A(2); -A(3)],[xcorr;ycorr;-zcorr],... %coordinates for transmitter and reciever,and velocity of transmitter and reciever
+%   [0;0;0],[0;0;0],1); 
+%   ValueofA{k}=aloss
+% %   data=ValueofA{k}
+% %   fnm=sprintf('file_%d.csv',k)
+% %   save(fnm,'data')       
+%   plot(1:Numberofsourcepaths,paths(1,:))
+%   xlabel('Path Index')
+%   ylabel('Delay Time (s)')                                          
+%   end
 figure (2)
 clf
 hold on
@@ -67,19 +63,26 @@ wav = phased.RectangularWaveform('PRF',prf,'PulseWidth',pulseWidth,...
   'SampleRate',fs);
 channel.SampleRate = fs;
 
-
-
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
     'FrequencyRange',[0 1000],'VoltageResponse',80,'BackBaffled',false);
-figure(20)
-patternAzimuth(projector,fc);
+% figure(20)
+% patternAzimuth(projector,fc);
+[ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
+projArray = phased.ConformalArray(...
+    'ElementPosition',[ElementPosition],...
+    'ElementNormal',[ElementNormal],'Element',projector);
 
+figure(23)
+pattern(projArray,fc,-180:180,0,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
+% figure(56)
+% viewArray(projArray,'ShowNormals',true);
 
 projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
 %takes only the last value of the coordinate at the moment
-beaconPlat = phased.Platform('InitialPosition',[A(1); A(2); -A(3)],...   % set a platform for the sound projector
+beaconPlat = phased.Platform('InitialPosition',[50; 50; -100],...   % set a platform for the sound projector
   'Velocity',[0; 0; 0]);
 
 hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 1000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
