@@ -2,7 +2,7 @@ clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth =2000
+channelDepth =1000
 Numberofsourcepaths =1
 BottomLoss=0.5
 LossFrequencies=1:1000
@@ -13,7 +13,7 @@ xcorr=900
 % ycorr='Please enter the y cordinate of the receiver';
 ycorr=900
 % zcorr='Please enter the z cordinate of the receiver';
-zcorr=1
+zcorr=900
 Speed='What is your propagation speed?';
 Speed=1500
 isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a  channel for the propagation 
@@ -64,7 +64,7 @@ wav = phased.RectangularWaveform('PRF',prf,'PulseWidth',pulseWidth,...
 channel.SampleRate = fs;
 
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-    'FrequencyRange',[0 1000],'VoltageResponse',1,'BackBaffled',true);
+    'FrequencyRange',[0 1000],'VoltageResponse',80,'BackBaffled',false);
 % figure(20)
 % patternAzimuth(projector,fc);
 [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
@@ -95,7 +95,7 @@ array = phased.ULA('Element',hydrophone,...                             %   This
 arrayCollector = phased.Collector('Sensor',array,...                    %collects incident narrowband signals from given directions 
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
-arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
+arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -xcorr],...
   'Velocity',[0; 0; 0]);
 
 % rx = phased.ReceiverPreamp(...                                          %Amplifiy weak signals to easier processing
@@ -103,12 +103,12 @@ arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
 %     'SampleRate',fs)
 
 x = wav(); 
-
+figure(34)
 
 figure(3);
 plot(wav); title('Waveform output, real part');
 xlabel('Samples'); ylabel('Amplitude (V)');                                                %Transmit 10 pings, pings appear as a peak in the received signals
-numTransmits = 1;
+numTransmits = 5;
 rxsig = zeros(size(x,1),2,numTransmits);
 for i = 1:numTransmits
 
@@ -128,7 +128,7 @@ for i = 1:numTransmits
   rsig = arrayCollector(rsig,rcvang);
   
   % Store the received pulses
-  rxsig(:,:,i) = abs((rsig));
+  rxsig(:,:,i) = abs(rsig);
  
 end
 t = (0:length(x)-1)'/fs;
@@ -138,8 +138,8 @@ xlabel('Time (s)');
 ylabel('Signal Amplitude (V)')
 dboutput=db(rxsig)
 figure(90)
-plot(t,dboutput(:,end))
+plot(t,dboutput)
 xlabel('Time (s)');
-ylabel('Signal Amplitude (dB)')
+ylabel('Signal Amplitude (V)')
 
 
