@@ -6,14 +6,15 @@ channelDepth =2000
 Numberofsourcepaths =1
 BottomLoss=0.5
 LossFrequencies=1:1000
+VoltageSensitivity=-200
 TxPos='Input matrix in standard MATLAB format such as [50 50 100;50 50 600;50 50 200]: '
 TxPos=[50 50 100;50 50 600;50 50 200]
 % xcorr='Please enter the x cordinate of the receiver';
-xcorr=900
+xcorr=5
 % ycorr='Please enter the y cordinate of the receiver';
-ycorr=900
+ycorr=5
 % zcorr='Please enter the z cordinate of the receiver';
-zcorr=1
+zcorr=5
 Speed='What is your propagation speed?';
 Speed=1500
 isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a  channel for the propagation 
@@ -64,7 +65,7 @@ wav = phased.RectangularWaveform('PRF',prf,'PulseWidth',pulseWidth,...
 channel.SampleRate = fs;
 
 projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-    'FrequencyRange',[0 1000],'VoltageResponse',1,'BackBaffled',true);
+    'FrequencyRange',[0 1000],'VoltageResponse',100,'BackBaffled',false);
 % figure(20)
 % patternAzimuth(projector,fc);
 [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
@@ -82,11 +83,11 @@ projRadiator = phased.Radiator('Sensor',projector,...                   %radiate
   'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
 %takes only the last value of the coordinate at the moment
-beaconPlat = phased.Platform('InitialPosition',[50; 50; -100],...   % set a platform for the sound projector
+beaconPlat = phased.Platform('InitialPosition',[0; 0; 0],...   % set a platform for the sound projector
   'Velocity',[0; 0; 0]);
 
 hydrophone = phased.IsotropicHydrophone('FrequencyRange',[0 1000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
-    'VoltageSensitivity',-200);
+    'VoltageSensitivity',VoltageSensitivity);
 
 array = phased.ULA('Element',hydrophone,...                             %   This object models a ULA formed with identical sensor elements.
   'NumElements',2,'ElementSpacing',Speed/fc/2,...
@@ -99,16 +100,16 @@ arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
   'Velocity',[0; 0; 0]);
 
 % rx = phased.ReceiverPreamp(...                                          %Amplifiy weak signals to easier processing
-%     'Gain',0,...
+%     'Gain',20,...
 %     'SampleRate',fs)
 
+
+
 x = wav(); 
-
-
-figure(3);
-plot(wav); title('Waveform output, real part');
-xlabel('Samples'); ylabel('Amplitude (V)');                                                %Transmit 10 pings, pings appear as a peak in the received signals
-numTransmits = 1;
+% figure(3);
+% plot(wav); title('Waveform output, real part');
+% xlabel('Samples'); ylabel('Amplitude (V)');                                                %Transmit 10 pings, pings appear as a peak in the received signals
+numTransmits = 10;
 rxsig = zeros(size(x,1),2,numTransmits);
 for i = 1:numTransmits
 
@@ -138,8 +139,9 @@ xlabel('Time (s)');
 ylabel('Signal Amplitude (V)')
 dboutput=db(rxsig)
 figure(90)
-plot(t,dboutput(:,end))
+plot(t,dboutput(:,end));
 xlabel('Time (s)');
 ylabel('Signal Amplitude (dB)')
-
-
+Vpp=peak2peak(rxsig(:,end))
+vdb=20*log10(Vpp)
+Recievelevel=vdb-(VoltageSensitivity)
