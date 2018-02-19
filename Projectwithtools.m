@@ -7,18 +7,18 @@ Numberofsourcepaths =1
 BottomLoss=0.5
 LossFrequencies=1:1000
 VoltageSensitivity=-200
-TxPos='Input matrix in standard MATLAB format such as [50 50 100;50 50 600;50 50 200]: '
-TxPos=[50 50 100;50 50 600;50 50 200]
+% TxPos='Input matrix in standard MATLAB format such as [50 50 100;50 50 600;50 50 200]: '
+% TxPos=[50 50 100;50 50 600;50 50 200]
 % xcorr='Please enter the x cordinate of the receiver';
-% xcorr=0
+xcorr=0
 % ycorr='Please enter the y cordinate of the receiver';
 ycorr=0
 % zcorr='Please enter the z cordinate of the receiver';
 zcorr=0
 Speed='What is your propagation speed?';
 Speed=1500
-forstep=100
-maxdistance=10000
+forstep=10000
+maxdistance=100000
 % values=zeros(size(xcorr))
 for xcorr=1:forstep:maxdistance
     
@@ -70,7 +70,7 @@ for xcorr=1:forstep:maxdistance
     channel.SampleRate = fs;
 
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-        'FrequencyRange',[0 1000],'VoltageResponse',200,'BackBaffled',false);
+        'FrequencyRange',[0 1000],'VoltageResponse',250,'BackBaffled',false);
     % figure(20)
     % patternAzimuth(projector,fc);
     [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
@@ -96,7 +96,7 @@ for xcorr=1:forstep:maxdistance
 
     array = phased.ULA('Element',hydrophone,...                             %   This object models a ULA formed with identical sensor elements.
     'NumElements',2,'ElementSpacing',Speed/fc/2,...
-    'ArrayAxis','z');
+    'ArrayAxis','x');
 
     arrayCollector = phased.Collector('Sensor',array,...                    %collects incident narrowband signals from given directions 
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
@@ -107,9 +107,6 @@ for xcorr=1:forstep:maxdistance
     % rx = phased.ReceiverPreamp(...                                          %Amplifiy weak signals to easier processing
     %     'Gain',20,...
     %     'SampleRate',fs)
-
-
-
     x = wav(); 
     % figure(3);
     % plot(wav); title('Waveform output, real part');
@@ -138,10 +135,10 @@ for xcorr=1:forstep:maxdistance
  
     end
     t = (0:length(x)-1)'/fs;
-%     figure(4)
-%     plot(t,rxsig(:,end))
-%     xlabel('Time (s)');
-%     ylabel('Signal Amplitude (V)')
+    figure(4)
+    plot(t,rxsig(:,end))
+    xlabel('Time (s)');
+    ylabel('Signal Amplitude (V)')
 %     dboutput=db(rxsig);
 %     figure(90)
 %     plot(t,dboutput(:,end));
@@ -151,17 +148,27 @@ for xcorr=1:forstep:maxdistance
     vdb=20*log10(Vpp);
     Recievelevel=vdb-(VoltageSensitivity);
     table(xcorr,forstep)=Recievelevel;
-    B=table>0;
-    C=table(B);
+%     B=table>0;
+%     C=table(B);
     tablecor(xcorr,forstep)=xcorr;
-    B1=tablecor>0;
-    C1=tablecor(B1);
+%     B1=tablecor>0;
+%     C1=tablecor(B1);
+    a1=table(table~=0);
+    b1=tablecor(tablecor~=0);
 %     hold on
 %     figure(100)
 %     plot(xcorr,C)
 end
-
-plot(C1,C)
-'Tool finish'
+% hold on;
+% plot(C1,C)
+figure(5)
+plot(b1,a1)
+% xcheck=C<50
+% Xcheck=xcheck(C)
+area(b1(),a1(),'basevalue',0,'Facecolor','r')
+% area(b1,a1,'basevalue',190,'FaceColor','g')
+% area(A(1:13),B(1:13),'basevalue',0,'FaceColor','g');
 xlabel('Distance in x axis(m)')
 ylabel('Reciever level(dB)')
+'Tool finish'
+% area(C1,C,'FaceColor','flat')
