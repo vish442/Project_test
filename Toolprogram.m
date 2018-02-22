@@ -2,10 +2,10 @@ clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth =2000
+channelDepth=2000
 Numberofsourcepaths =1
 BottomLoss=0.5
-LossFrequencies=1:100
+LossFrequencies=1:1000
 VoltageSensitivity=-200
 % xcorr='Please enter the x cordinate of the receiver';
 xcorr=0
@@ -14,11 +14,10 @@ ycorr=0
 % zcorr='Please enter the z cordinate of the receiver';
 zcorr=0
 Speed=1500
-forstep=5
-maxdistance=15500
-for xcorr=14500:forstep:maxdistance
-    
-    isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a  channel for the propagation 
+forstep=5000
+maxdistance=200000
+for xcorr=1:forstep:maxdistance
+    isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
           'NumPathsSource',...                  
           'Property',...                        
@@ -40,12 +39,12 @@ for xcorr=14500:forstep:maxdistance
     channel.SampleRate = fs;
 
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-        'FrequencyRange',[1 100],'VoltageResponse',250,'BackBaffled',false);
+        'FrequencyRange',[1 1000],'VoltageResponse',240,'BackBaffled',false);
     
-    [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
+%     [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
     projArray = phased.ConformalArray(...
-        'ElementPosition',[ElementPosition],...
-        'ElementNormal',[ElementNormal],'Element',projector);
+        'ElementPosition',[0;0;0],...
+        'ElementNormal',[0;0],'Element',projector);
 
     projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
@@ -69,7 +68,7 @@ for xcorr=14500:forstep:maxdistance
 
     x = wav(); 
     %Transmit 10 pings, pings appear as a peak in the received signals
-    numTransmits = 10;
+    numTransmits = 200;
     rxsig = zeros(size(x,1),2,numTransmits);
     for i = 1:numTransmits
 
@@ -98,18 +97,38 @@ for xcorr=14500:forstep:maxdistance
     plot(t,rxsig(:,end))
     xlabel('Time (s)');
     ylabel('Signal Amplitude (V)')
-
-    Vpp=peak2peak(rxsig(:,end));
-    vdb=20*log10(Vpp);
-    Recievelevel=vdb-(VoltageSensitivity);
+    Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
+    vdb=20*log10(Vpp); %work out the dB of the voltage signal
+    Recievelevel=vdb-(VoltageSensitivity); % equation in dB for the voltage sensitivity
     table(xcorr,forstep)=Recievelevel;
     tablecor(xcorr,forstep)=xcorr;
-    a1=table(table~=0);
-    b1=tablecor(tablecor~=0);
+%     pathstable(xcorr,forstep)=paths(3)
 end
-figure(5)
-plot(b1,a1)
+% a1=table(table~=0 & isfinite(table));
+% b1=tablecor(tablecor~=0 & isfinite(tablecor));
+a1=table(table~=0);
+b1=tablecor(tablecor~=0);
 
+clf
+% P1=pathstable(pathstable~=0)
+figure(5)
+hold on
+plot(b1,a1)
+% ref=10000:forstep:500000;
+% Int1=spline(b1,a1,ref);
+% Int2=pchip(b1,a1,ref)
+% g=fnxtr(a1)
+% plot(ref,Int1)
+% % vq1=interp1(b1,a1,ref)
+% axis([1 60000 0 250])
+% P2=150-P1
+% P2B=P2
+% maxlength=max([length(b1)])
+% P2(length(b1)+maxlength)=0
+% plot(P2)
+% plot(b1,P1)
+% figure(56)
+%     viewArray(projArray,'ShowNormals',true);
 xlabel('Distance in x axis(m)')
 ylabel('Reciever level(dB)')
 'Tool finish'

@@ -15,7 +15,7 @@ ycorr=0
 zcorr=0
 Speed='What is your propagation speed?';
 Speed=1500
-forstep=5
+forstep=1
 maxdistance=15500
 % values=zeros(size(xcorr))
 for xcorr=14500:forstep:maxdistance
@@ -58,7 +58,7 @@ for xcorr=14500:forstep:maxdistance
     channel.SampleRate = fs;
 
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-        'FrequencyRange',[99999999 99999999+1],'VoltageResponse',50,'BackBaffled',false);
+        'FrequencyRange',[99999999 99999999+1],'VoltageResponse',200,'BackBaffled',false);
     % figure(20)
     % patternAzimuth(projector,fc);
     [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
