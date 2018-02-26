@@ -2,11 +2,12 @@ clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth=2000
+channelDepth=2000;
 Numberofsourcepaths =1
-BottomLoss=0.5
-LossFrequencies=1:1000
+BottomLoss=0.5;
+LossFrequencies=1:100000;
 VoltageSensitivity=-200
+VoltageResponse=150
 % xcorr='Please enter the x cordinate of the receiver';
 xcorr=0
 % ycorr='Please enter the y cordinate of the receiver';
@@ -15,7 +16,9 @@ ycorr=0
 zcorr=0
 Speed=1500
 forstep=5000
-maxdistance=200000
+maxdistance=300000
+table=zeros(300000,6000);
+tablecor=zeros(300000,6000);
 for xcorr=1:forstep:maxdistance
     isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
@@ -39,7 +42,7 @@ for xcorr=1:forstep:maxdistance
     channel.SampleRate = fs;
 
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
-        'FrequencyRange',[1 1000],'VoltageResponse',240,'BackBaffled',false);
+        'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
 %     [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
     projArray = phased.ConformalArray(...
@@ -53,7 +56,7 @@ for xcorr=1:forstep:maxdistance
     beaconPlat = phased.Platform('InitialPosition',[0; 0; 0],...   % set a platform for the sound projector
      'Velocity',[0; 0; 0]);
 
-    hydrophone = phased.IsotropicHydrophone('FrequencyRange',[1 1000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
+    hydrophone = phased.IsotropicHydrophone('FrequencyRange',[1 100000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
      'VoltageSensitivity',VoltageSensitivity);
 
     array = phased.ULA('Element',hydrophone,...                             %   This object models a ULA formed with identical sensor elements.
@@ -104,27 +107,25 @@ for xcorr=1:forstep:maxdistance
     tablecor(xcorr,forstep)=xcorr;
 %     pathstable(xcorr,forstep)=paths(3)
 end
-% a1=table(table~=0 & isfinite(table));
-% b1=tablecor(tablecor~=0 & isfinite(tablecor));
+
 a1=table(table~=0);
 b1=tablecor(tablecor~=0);
-
 clf
-% P1=pathstable(pathstable~=0)
+A1=find(a1>60);
+results=a1(A1);
 figure(5)
 hold on
-plot(b1,a1)
+area(b1(1:A1(end)),a1(1:A1(end)),'basevalue',0,'FaceColor','r')
+area(b1(A1(end):end),a1(A1(end):end),'basevalue',0,'FaceColor','g')
+% ylim([0 VoltageResponse])
 % ref=10000:forstep:500000;
 % Int1=spline(b1,a1,ref);
 % Int2=pchip(b1,a1,ref)
 % g=fnxtr(a1)
 % plot(ref,Int1)
 % % vq1=interp1(b1,a1,ref)
-% axis([1 60000 0 250])
-% P2=150-P1
-% P2B=P2
-% maxlength=max([length(b1)])
-% P2(length(b1)+maxlength)=0
+% ylim([0 VoltageResponse])
+
 % plot(P2)
 % plot(b1,P1)
 % figure(56)
