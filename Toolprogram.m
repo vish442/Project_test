@@ -3,22 +3,22 @@ clearvars
 fc='What is your operating frequency';
 fc=input(fc);
 channelDepth=2000;
-Numberofsourcepaths =1
+Numberofsourcepaths =1;
 BottomLoss=0.5;
 LossFrequencies=1:100000;
-VoltageSensitivity=-200
-VoltageResponse=150
+VoltageSensitivity=-200;
+VoltageResponse=240;   %SOURCE LEVEL
 % xcorr='Please enter the x cordinate of the receiver';
-xcorr=0
+xcorr=0;
 % ycorr='Please enter the y cordinate of the receiver';
-ycorr=0
+ycorr=0;
 % zcorr='Please enter the z cordinate of the receiver';
-zcorr=0
-Speed=1500
-forstep=5000
-maxdistance=300000
-table=zeros(300000,6000);
-tablecor=zeros(300000,6000);
+zcorr=0;
+Speed=1500;
+forstep=2;
+maxdistance=100;
+table=zeros(maxdistance,60);
+tablecor=zeros(maxdistance,60);
 for xcorr=1:forstep:maxdistance
     isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
@@ -32,7 +32,7 @@ for xcorr=1:forstep:maxdistance
     channel = phased.MultipathChannel(...
           'OperatingFrequency',fc);                                                
 
-%creating a rectanglaur pulse of 1 sec interval with 10ms width
+%creating a rectangular pulse of 1 sec interval with 10ms width
     prf = 1;                 
     pulseWidth = 10e-3;
     pulseBandwidth = 1/pulseWidth;
@@ -44,10 +44,10 @@ for xcorr=1:forstep:maxdistance
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
         'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
-%     [ElementPosition,ElementNormal] = helperSphericalProjector(8,fc,Speed);
+    [ElementPosition,ElementNormal] = Projectorsetup(4,fc,Speed);
     projArray = phased.ConformalArray(...
-        'ElementPosition',[0;0;0],...
-        'ElementNormal',[0;0],'Element',projector);
+        'ElementPosition',[ElementPosition],...
+        'ElementNormal',[ElementNormal],'Element',projector);
 
     projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
@@ -70,7 +70,7 @@ for xcorr=1:forstep:maxdistance
     'Velocity',[0; 0; 0]);
 
     x = wav(); 
-    %Transmit 10 pings, pings appear as a peak in the received signals
+    %Transmit pings, pings appear as a peak in the received signals
     numTransmits = 200;
     rxsig = zeros(size(x,1),2,numTransmits);
     for i = 1:numTransmits
@@ -113,11 +113,13 @@ b1=tablecor(tablecor~=0);
 clf
 A1=find(a1>60);
 results=a1(A1);
+figure(7)
+plot(b1,a1)
 figure(5)
 hold on
 area(b1(1:A1(end)),a1(1:A1(end)),'basevalue',0,'FaceColor','r')
 area(b1(A1(end):end),a1(A1(end):end),'basevalue',0,'FaceColor','g')
-% ylim([0 VoltageResponse])
+ylim([0 VoltageResponse])
 % ref=10000:forstep:500000;
 % Int1=spline(b1,a1,ref);
 % Int2=pchip(b1,a1,ref)
@@ -125,11 +127,12 @@ area(b1(A1(end):end),a1(A1(end):end),'basevalue',0,'FaceColor','g')
 % plot(ref,Int1)
 % % vq1=interp1(b1,a1,ref)
 % ylim([0 VoltageResponse])
-
-% plot(P2)
-% plot(b1,P1)
 % figure(56)
 %     viewArray(projArray,'ShowNormals',true);
 xlabel('Distance in x axis(m)')
 ylabel('Reciever level(dB)')
 'Tool finish'
+figure(6)
+plot(1:Numberofsourcepaths,paths(1,:))
+  xlabel('Path Index')
+  ylabel('Delay Time (s)')         
