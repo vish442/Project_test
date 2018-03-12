@@ -15,8 +15,8 @@ ycorr=0;
 % zcorr='Please enter the z cordinate of the receiver';
 zcorr=0;
 Speed=1500;
-forstep=50;
-maxdistance=1000;
+forstep=500;
+maxdistance=10000000;
 table=zeros(maxdistance,60);
 tablecor=zeros(maxdistance,60);
 countstep=1;
@@ -112,17 +112,17 @@ for xcorr=1:forstep:maxdistance
 %     pathstable(xcorr,forstep)=paths(3)
 end
 
-a1=table(table~=0);
-b1=tablecor(tablecor~=0);
+% a1=table(table~=0);
+% b1=tablecor(tablecor~=0);
 clf
-A1=find(a1>60);
-results=a1(A1);
-figure(7)
-plot(b1,a1)
+A1=find(table2>60);
+results=table2(A1);
+% figure(7)
+% plot(b1,a1)
 figure(5)
 hold on
-area(b1(1:A1(end)),a1(1:A1(end)),'basevalue',0,'FaceColor','r')
-area(b1(A1(end):end),a1(A1(end):end),'basevalue',0,'FaceColor','g')
+area(xdist2(1:A1(end)),table2(1:A1(end)),'basevalue',0,'FaceColor','r')
+area(xdist2(A1(end):end),table2(A1(end):end),'basevalue',0,'FaceColor','g')
 ylim([0 VoltageResponse])
 % ref=10000:forstep:500000;
 % Int1=spline(b1,a1,ref);
@@ -136,7 +136,7 @@ ylim([0 VoltageResponse])
 xlabel('Distance in x axis(m)')
 ylabel('Reciever level(dB)')
 'Tool finish'
-figure(6)
-plot(1:Numberofsourcepaths,paths(1,:))
-  xlabel('Path Index')
-  ylabel('Delay Time (s)')         
+% figure(6)
+% plot(1:Numberofsourcepaths,paths(1,:))
+%   xlabel('Path Index')
+%   ylabel('Delay Time (s)')         
