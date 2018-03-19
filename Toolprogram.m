@@ -2,7 +2,7 @@ clf
 clearvars
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth=2000;
+channelDepth=100;
 Numberofsourcepaths =1;
 BottomLoss=0.5;
 LossFrequencies=1:100000;
@@ -13,10 +13,10 @@ xcorr=0;
 % ycorr='Please enter the y cordinate of the receiver';
 ycorr=0;
 % zcorr='Please enter the z cordinate of the receiver';
-zcorr=0;
+zcorr=50;
 Speed=1500;
-forstep=500;
-maxdistance=10000000;
+forstep=50;
+maxdistance=1000;
 table=zeros(maxdistance,60);
 tablecor=zeros(maxdistance,60);
 countstep=1;
@@ -54,7 +54,7 @@ for xcorr=1:forstep:maxdistance
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
     
-    beaconPlat = phased.Platform('InitialPosition',[0; 0; 0],...   % set a platform for the sound projector
+    beaconPlat = phased.Platform('InitialPosition',[0; 0; -50],...   % set a platform for the sound projector
      'Velocity',[0; 0; 0]);
 
     hydrophone = phased.IsotropicHydrophone('FrequencyRange',[1 100000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 

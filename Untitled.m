@@ -1,2 +1,1 @@
- 
-plot(b1,al)
+plot(xdist2,table2)
