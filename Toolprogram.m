@@ -7,16 +7,16 @@ Numberofsourcepaths =1;
 BottomLoss=0.5;
 LossFrequencies=1:100000;
 VoltageSensitivity=-200;
-VoltageResponse=100;   %SOURCE LEVEL
+VoltageResponse=240;   %SOURCE LEVEL
 % xcorr='Please enter the x cordinate of the receiver';
-xcorr=0;
+% xcorr=0;
 % ycorr='Please enter the y cordinate of the receiver';
-ycorr=0;
+ycorr=1;
 % zcorr='Please enter the z cordinate of the receiver';
-zcorr=50;
+zcorr=1;
 Speed=1500;
-forstep=100;
-maxdistance=1000;
+forstep=1000;
+maxdistance=100000;
 table=zeros(maxdistance,60);
 tablecor=zeros(maxdistance,60);
 countstep=1;
@@ -58,7 +58,7 @@ for xcorr=1:forstep:maxdistance
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
     
-    beaconPlat = phased.Platform('InitialPosition',[0; 0; -50],...   % set a platform for the sound projector
+    beaconPlat = phased.Platform('InitialPosition',[1000; 100; -5],...   % set a platform for the sound projector
      'Velocity',[0; 0; 0]);
 
     hydrophone = phased.IsotropicHydrophone('FrequencyRange',[1 100000],...  %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 

@@ -4,14 +4,16 @@ function [ElementPosition,ElementNormal] = helperSphericalProjector(N,fc,prop_sp
 % ActiveSonarExample. It may be removed in a future release.
 
 %   Copyright 2016 The MathWorks, Inc.
-
+N=3
+fc=1
+prop_speed=1500
 azang = repmat((0:N-1)*360/(N)-180,N,1);
 elang = repmat((0:N-1)'*180/(N-1)-90,1,N);
 r = fc/prop_speed*ones(size(azang));
 
-x = r.*cosd(elang).*cosd(azang);
-y = r.*cosd(elang).*sind(azang);
-z = r.*sind(elang);
+x = r.*cosd(elang).*cosd(azang)
+y = r.*cosd(elang).*sind(azang)
+z = r.*sind(elang)
 
 ElementPosition = [x(:)';y(:)';z(:)'];
 ElementNormal = [azang(:)';elang(:)'];

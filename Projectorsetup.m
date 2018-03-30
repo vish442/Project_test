@@ -7,14 +7,17 @@ function [ElementPosition,ElementNormal] = Projectorsetup(N,fc,Speed)
 
 % azang = repmat(0:N)
 
-azang = repmat((1:N-1)*10,N-1,1);        
-r = fc./Speed.*ones(size(azang));
-x := matrix([[10, 10, 10], [10, 10, ]])
+% azang = repmat((1:N-1)*10,N-1,1);        
+% r = fc./Speed.*ones(size(azang));
+% r=1./fc./Speed/2
+x = [1,1]
+y = [1,0.0025]
+z = [1,1] 
 % x = azang;
 % y = azang
 % z = azang
 
 
 ElementPosition = [x(:)';y(:)';z(:)'];
-ElementNormal = [-90';-90'];
+ElementNormal = [0';0'];
 end
