@@ -15,7 +15,7 @@ ycorr=0;
 % zcorr='Please enter the z cordinate of the receiver';
 zcorr=50;
 Speed=1500;
-forstep=50;
+forstep=100;
 maxdistance=1000;
 table=zeros(maxdistance,60);
 tablecor=zeros(maxdistance,60);
@@ -45,10 +45,14 @@ for xcorr=1:forstep:maxdistance
     projector = phased.IsotropicProjector(...                                    %set up the sound projector with frequency range of 0 to 30e3
         'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
-%     [ElementPosition,ElementNormal] = Projectorsetup(4,fc,Speed);
+    [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed);
+%     projArray = phased.ConformalArray(...
+%         'ElementPosition',[0;0;0],...
+%         'ElementNormal',[0;0],'Element',projector);
     projArray = phased.ConformalArray(...
-        'ElementPosition',[0;0;0],...
-        'ElementNormal',[0;0],'Element',projector);
+        'ElementPosition',ElementPosition,...
+        'ElementNormal',ElementNormal,'Element',projector);
+    
 
     projRadiator = phased.Radiator('Sensor',projector,...                   %radiates the sound projector signal outwards to the far field
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
@@ -97,8 +101,8 @@ for xcorr=1:forstep:maxdistance
     end
     t = (0:length(x)-1)'/fs;
     clf
-    figure(4)
-    plot(t,rxsig(:,end))
+%     figure(4)
+%     plot(t,rxsig(:,end))
     xlabel('Time (s)');
     ylabel('Signal Amplitude (V)')
     Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
@@ -124,15 +128,11 @@ hold on
 area(xdist2(1:A1(end)),table2(1:A1(end)),'basevalue',0,'FaceColor','r')
 area(xdist2(A1(end):end),table2(A1(end):end),'basevalue',0,'FaceColor','g')
 ylim([0 VoltageResponse])
-% ref=10000:forstep:500000;
-% Int1=spline(b1,a1,ref);
-% Int2=pchip(b1,a1,ref)
-% g=fnxtr(a1)
-% plot(ref,Int1)
-% % vq1=interp1(b1,a1,ref)
-% ylim([0 VoltageResponse])
-% figure(56)
-%     viewArray(projArray,'ShowNormals',true);
+figure(2)
+pattern(projArray,fc,-180:180,0,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
+figure(56)
+    viewArray(projArray,'ShowNormals',true);
 xlabel('Distance in x axis(m)')
 ylabel('Reciever level(dB)')
 'Tool finish'
