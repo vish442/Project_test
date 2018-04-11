@@ -5,12 +5,12 @@ switch n
     case 1
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth=10;
+channelDepth=100;
 Numberofsourcepaths =1;
 BottomLoss=0.5;
 LossFrequencies=1:1000000;
 VoltageSensitivity=-200;
-VoltageResponse=165;   %SOURCE LEVEL
+VoltageResponse=1;   %SOURCE LEVEL
 tot_toc=0
 h=waitbar(0,'Program is running...');
 % tic
@@ -133,7 +133,7 @@ Reducearray=Recievetable(Recievetable~=0 & isfinite(Recievetable));
 Reducearrayx=xdist2(xdist2~=0);
 Recievetable=Reducearray;
 xdist2=Reducearrayx;
-if all(Recievetable<0)
+if Recievetable=all(Recievetable<0);
     plot(xdist2,Recievetable)
     xlabel('Distance in x axis(m)')
     ylabel('Reciever level(dB)')
