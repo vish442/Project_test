@@ -1,23 +1,76 @@
 function [ElementPosition,ElementNormal] = Projectorsetup(N,fc,Speed)
-% This function helperSphericalProjector is only in support of
-% ActiveSonarExample. It may be removed in a future release.
-
-%   Copyright 2016 The MathWorks, Inc.
-
-
 % azang = repmat(0:N)
-
 % azang = repmat((1:N-1)*10,N-1,1);        
 % r = fc./Speed.*ones(size(azang));
 % r=1./fc./Speed/2
-x = [1,0.0025]
-y = [1,1]
-z = [1,1] 
+
+% 'Custom or frequency based?(C(custom) F(frequency based)'
+% placementchoice=input(placementchoice)
+
+% if placmentchoice=='C'
+    
+clear hydrophonecoordinates & i & index1 & cout 
+N=input('How many sources? ')
+
+'Custom or frequency based?(1 for custom, 2 for frequency based)'
+n = input('Enter a number: ');
+
+switch n
+    case 1
+    
+hydrophonecoordinates=(zeros(3,N))
+angle=(zeros(2,N))
+counter={'Please enter x coordinate','Please enter y coordinate','Please enter z coordinate'}; 
+cout=1
+index1=1;
+i=1;
+       
+        while i<=numel(hydrophonecoordinates)
+%             for i=1:numel(hydrophonecoordinates)
+            
+            if  index1>3
+                index1=1;
+            elseif i==numel(hydrophonecoordinates)
+                disp(counter{index1})
+                hydrophonecoordinates(i)=input('') 
+                hydrophonecoordinates;
+                
+                break
+            else
+                if index1==1||2 & i==1||2
+                disp(counter{index1})
+                hydrophonecoordinates(i)=input('') 
+                hydrophonecoordinates;
+                
+                index1=index1+1;
+                i=i+1;
+                
+                else
+                disp(counter{index1})
+                hydrophonecoordinates(i)=input('')
+                i=i+1;
+                end
+            end
+            
+        end
+        end
+        
+        while cout<=numel(angle)
+            [m,n]=size(angle);
+            ang= ' What is the angle of element %d';
+            ang(cout)=input('')
+            str=sprintf(ang,cout)
+            cout=cout+1;
+                
+        end            
+            
+%         end
 % x = azang;
 % y = azang
 % z = azang
 
-
-ElementPosition = [x(:)';y(:)';z(:)'];
+ElementPosition = [hydrophonecoordinates];
+% ElementPosition = [x(:)';y(:)';z(:)'];
 ElementNormal = [0';0'];
+
 end
