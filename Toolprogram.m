@@ -6,14 +6,13 @@ switch n
 fc='What is your operating frequency';
 fc=input(fc);
 channelDepth=10;
-Numberofsourcepaths =3;
+Numberofsourcepaths =1;
 BottomLoss=0.5;
 LossFrequencies=1:1000000;
 VoltageSensitivity=-200;
-VoltageResponse=100.65;   %SOURCE LEVEL
-redzone=0.01
+VoltageResponse=200;   %SOURCE LEVEL
+redzone=40
 tot_toc=0
-h=waitbar(0,'Program is running...');
 % tic
 % xcorr='Please enter the x cordinate of the receiver';
 % xcorr=0;
@@ -23,10 +22,12 @@ ycorr=1;
 zcorr=1;
 Speed=1500;
 forstep=100;
-maxdistance=7000;
+maxdistance=300;
 Recievetable=zeros(maxdistance,60);
 xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
+pressuretable=zeros(maxdistance,60);
+time=zeros(maxdistance,60);
 countstep=1;
 % for xcorr=1:forstep:maxdistance
     
@@ -59,9 +60,6 @@ countstep=1;
         'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
     [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed);
-%     projArray = phased.ConformalArray(...
-%         'ElementPosition',[0;0;0],...
-%         'ElementNormal',[0;0],'Element',projector);
     projArray = phased.ConformalArray(...
         'ElementPosition',ElementPosition,...
         'ElementNormal',ElementNormal,'Element',projector);
@@ -86,6 +84,8 @@ countstep=1;
 %collects incident narrowband signals from given directions 
     arrayCollector = phased.Collector('Sensor',array,...                 
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
+h=waitbar(0,'Program is running...');
+
 for xcorr=1:forstep:maxdistance
      tic
     arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
@@ -112,16 +112,17 @@ for xcorr=1:forstep:maxdistance
   % Collect the propagated signal
     rsig = arrayCollector(rsig,rcvang);
   
-  % Store the received pulses
+  % Store the received pulses making all voltage values as DC by using
+  % abosoultes
     rxsig(:,:,i) = abs((rsig));
  
     end
     t = (0:length(x)-1)'/fs;
     clf
-%     figure(4)
-%     plot(t,rxsig(:,end))
-%     xlabel('Time (s)');
-%     ylabel('Signal Amplitude (V)')
+    figure(4)
+    plot(t,rxsig(:,end))
+    xlabel('Time (s)');
+    ylabel('Signal Amplitude (V)')
     Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
     vdb=20*log10(Vpp); %work out the dB of the voltage signal
     energy=trapz(rxsig(:,end));
@@ -131,6 +132,9 @@ for xcorr=1:forstep:maxdistance
     energytable(countstep)=energy;
     countstep=countstep+1;              %Indexing the array 
     waitbar(xcorr/maxdistance);
+    pressure=10^(Recievelevel/20)*1e-6;
+    pressuretable(countstep)=pressure;
+    time(countstep)=t;
 %     pause(0.015)
     tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, xcorr, maxdistance-1 )
 

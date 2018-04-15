@@ -67,13 +67,13 @@ i=1;
             cout=cout+1;
                 
         end            
-        case 2
-            
-             while cout<=numel(angle)
-            ang= ' What is the angle of element(two numbers) %d';
-            str=sprintf(ang,cout)
-            angle(cout)=input('')
-            cout=cout+1;
+%         case 2
+%             
+%              while cout<=numel(angle)
+%             ang= ' What is the angle of element(two numbers) %d';
+%             str=sprintf(ang,cout)
+%             angle(cout)=input('')
+%             cout=cout+1;
 %         end
 % x = azang;
 % y = azang
