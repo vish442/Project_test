@@ -11,6 +11,9 @@ function [ElementPosition,ElementNormal] = Projectorsetup(N,fc,Speed)
     
 clear hydrophonecoordinates & i & index1 & cout 
 N=input('How many sources? ')
+% ang=input('What is the angle of the element %d');
+
+% ang= ' What is the angle of element %d';
 
 'Custom or frequency based?(1 for custom, 2 for frequency based)'
 n = input('Enter a number: ');
@@ -20,6 +23,8 @@ switch n
     
 hydrophonecoordinates=(zeros(3,N))
 angle=(zeros(2,N))
+[m,n]=size(angle);
+
 counter={'Please enter x coordinate','Please enter y coordinate','Please enter z coordinate'}; 
 cout=1
 index1=1;
@@ -56,14 +61,19 @@ i=1;
         end
         
         while cout<=numel(angle)
-            [m,n]=size(angle);
-            ang= ' What is the angle of element %d';
-            ang(cout)=input('')
+            ang= ' What is the angle of element(two numbers) %d';
             str=sprintf(ang,cout)
+            angle(cout)=input('')
             cout=cout+1;
                 
         end            
+        case 2
             
+             while cout<=numel(angle)
+            ang= ' What is the angle of element(two numbers) %d';
+            str=sprintf(ang,cout)
+            angle(cout)=input('')
+            cout=cout+1;
 %         end
 % x = azang;
 % y = azang
@@ -71,6 +81,6 @@ i=1;
 
 ElementPosition = [hydrophonecoordinates];
 % ElementPosition = [x(:)';y(:)';z(:)'];
-ElementNormal = [0';0'];
+ElementNormal = [angle];
 
 end
