@@ -1,1 +1,4 @@
-pressure=10^(Recievelevel/20)*1e-6
+ 
+plot(t,rxsig(:,end))
+    xlabel('Time (s)');
+    ylabel('Signal Amplitude (V)')

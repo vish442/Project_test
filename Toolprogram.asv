@@ -135,10 +135,10 @@ for xcorr=1:forstep:maxdistance
     pressure=10^(Recievelevel/20)*1e-6;
     pressuretable(countstep)=pressure;
     timefinder=find(rxsig(:,end)>0)
-    timedist=t(timefinder);
-    time1=timedist(3);
-    time2-timedist(1);
-    recordtime=time1-time2;
+    timedist=t(timefinder)
+    time1=timedist(3)
+    time2-timedist(1)
+    recorded t
 %     time(countstep)=t;
 %     pause(0.015)
     tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, xcorr, maxdistance-1 )
