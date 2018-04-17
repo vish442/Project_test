@@ -1,4 +1,4 @@
-function [ElementPosition,ElementNormal] = Projectorsetup(N,fc,Speed)
+function [ElementPosition,ElementNormal] = Projectorsetup(N,fc,Speed,projector)
 % azang = repmat(0:N)
 % azang = repmat((1:N-1)*10,N-1,1);        
 % r = fc./Speed.*ones(size(azang));
@@ -17,7 +17,7 @@ N=input('How many sources? ')
 
 'Custom or frequency based?(1 for custom, 2 for frequency based)'
 n = input('Enter a number: ');
-
+landa=Speed/fc
 switch n
     case 1
     
@@ -68,7 +68,11 @@ i=1;
                 
         end            
         case 2
-            
+%             
+hydrophonecoordinates=(zeros(4,4))
+
+ 
+
         end    
         
 % x = azang;

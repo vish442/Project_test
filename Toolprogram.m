@@ -8,9 +8,10 @@ fc=input(fc);
 channelDepth=10;
 Numberofsourcepaths =1;
 BottomLoss=0.5;
+
 LossFrequencies=1:1000000;
 VoltageSensitivity=-200;
-VoltageResponse=200;   %SOURCE LEVEL
+VoltageResponse=100;   %SOURCE LEVEL
 redzone=40
 tot_toc=0
 % tic
@@ -21,6 +22,7 @@ ycorr=1;
 % zcorr='Please enter the z cordinate of the receiver';
 zcorr=1;
 Speed=1500;
+landa=Speed/fc;
 forstep=100;
 maxdistance=300;
 Recievetable=zeros(maxdistance,60);
@@ -28,10 +30,7 @@ xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
 pressuretable=zeros(maxdistance,60);
 time=zeros(10000,1);
-countstep=1;
-% for xcorr=1:forstep:maxdistance
-    
-   
+countstep=1; 
     isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
           'NumPathsSource',...                  
@@ -59,16 +58,25 @@ countstep=1;
     projector = phased.IsotropicProjector(...                                    
         'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
-    [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed);
-    projArray = phased.ConformalArray(...
-        'ElementPosition',ElementPosition,...
-        'ElementNormal',ElementNormal,'Element',projector);
-    delay=phased.ElementDelay('SensorArray',projArray,...
-    'PropagationSpeed',Speed)
-    delay_secs=delay([-90;90])
+%     [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed,projector);
+    arrayrect=phased.URA('Element',projector,...
+ 'Size',[4,4],...
+ 'ElementSpacing',[landa/2 landa/2],...
+ 'ArrayNormal','z')
+    
+    
+%     projArray = phased.ConformalArray(...
+%         'ElementPosition',ElementPosition,...
+%         'ElementNormal',ElementNormal,'Element',projector);
+
+
+%     delay=phased.ElementDelay('SensorArray',projArray,...
+%     'PropagationSpeed',Speed)
+%     delay_secs=delay([-90;90])
+% steervec=phased.SteeringVector('SensorArray',arrayrect
     
 %radiates the sound projector signal outwards to the far field
-    projRadiator = phased.Radiator('Sensor',projector,...                   
+    projRadiator = phased.Radiator('Sensor',arrayect,...                   
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
     % set a platform for the sound projector
@@ -82,7 +90,7 @@ countstep=1;
  %   This object models a ULA formed with identical sensor elements.
     array = phased.ULA('Element',hydrophone,...                             
     'NumElements',2,'ElementSpacing',Speed/fc/2,...
-    'ArrayAxis','x');
+    'ArrayAxis','z');
 
 phased.ReplicatedSubarray
 
@@ -158,7 +166,7 @@ Reducearray=Recievetable(Recievetable~=0 & isfinite(Recievetable));
 Reducearrayx=xdist2(xdist2~=0);
 xdist2=Reducearrayx;
 % y=flipud(Reducearray);
-y=Reducearray*1
+y=Reducearray*1;
 A1=find(y>redzone);
 TF=isempty(A1)
 x=all(Reducearray<0)& TF==1;
@@ -188,12 +196,12 @@ else
     xlabel('Distance in x axis(m)')
     ylabel('Reciever level(dB)')
     figure(2)
-    pattern(projArray,fc,-180:180,-90,'CoordinateSystem','polar',...
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
       'PropagationSpeed',Speed);
   figure(900)
-  pattern(projArray,fc,'CoordinateSystem','polar','Type','directivity');
+  pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
     figure(56)
-    viewArray(projArray,'ShowNormals',true);
+    viewArray(arrayrect,'ShowNormals',true);
     xlabel('Distance in x axis(m)')
     ylabel('Reciever level(dB)')
     close(h);
