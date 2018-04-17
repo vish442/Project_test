@@ -1,2 +1,4 @@
-B1=[0,1,2,3,4,0]
-FindA1=find(B1==0)
+% pattern(projArray,fc,'CoordinateSystem','polar','Type','directivity');
+
+pattern(projArray,fc,-180:180,0,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);

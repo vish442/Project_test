@@ -1,4 +1,7 @@
- 
-plot(t,rxsig(:,end))
-    xlabel('Time (s)');
-    ylabel('Signal Amplitude (V)')
+beamformer = phased.PhaseShiftBeamformer('SensorArray',projArray,...
+    'OperatingFrequency',fc,'PropagationSpeed',Speed,...
+    'DirectionSource','Input port','WeightsOutputPort',true);
+ [y,w]=beamformer(arrayCollector,[45;0])
+pattern(projArray,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed,'Weights',w);
+  

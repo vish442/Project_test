@@ -63,13 +63,16 @@ countstep=1;
     projArray = phased.ConformalArray(...
         'ElementPosition',ElementPosition,...
         'ElementNormal',ElementNormal,'Element',projector);
+    delay=phased.ElementDelay('SensorArray',projArray,...
+    'PropagationSpeed',Speed)
+    delay_secs=delay([-90;90])
     
 %radiates the sound projector signal outwards to the far field
     projRadiator = phased.Radiator('Sensor',projector,...                   
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
     % set a platform for the sound projector
-    beaconPlat = phased.Platform('InitialPosition',[100000; 100; -5],...   
+    beaconPlat = phased.Platform('InitialPosition',[10; 10; -5],...   
      'Velocity',[0; 0; 0]);
  
 %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
@@ -81,10 +84,14 @@ countstep=1;
     'NumElements',2,'ElementSpacing',Speed/fc/2,...
     'ArrayAxis','x');
 
+phased.ReplicatedSubarray
+
 %collects incident narrowband signals from given directions 
     arrayCollector = phased.Collector('Sensor',array,...                 
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
+
 h=waitbar(0,'Program is running...');
+
 
 for xcorr=1:forstep:maxdistance
      tic
@@ -92,6 +99,8 @@ for xcorr=1:forstep:maxdistance
     'Velocity',[0; 0; 0]);
 
     x = wav(); 
+    
+    
     %Transmit pings, pings appear as a peak in the received signals
     numTransmits = 100;
     rxsig = zeros(size(x,1),2,numTransmits);
@@ -134,11 +143,11 @@ for xcorr=1:forstep:maxdistance
     waitbar(xcorr/maxdistance);
     pressure=10^(Recievelevel/20)*1e-6;
     pressuretable(countstep)=pressure;
-    timefinder=find(rxsig(:,end)>0)
-    timedist=t(timefinder);
-    time1=timedist(3);
-    time2-timedist(1);
-    recordtime=time1-time2;
+%     timefinder=find(rxsig(:,end)>0);
+%     timedist=t(timefinder);
+%     time1=timedist(3);
+%     time2=timedist(1);
+%     recordtime=time1-time2;
 %     time(countstep)=t;
 %     pause(0.015)
     tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, xcorr, maxdistance-1 )
@@ -148,10 +157,11 @@ clf
 Reducearray=Recievetable(Recievetable~=0 & isfinite(Recievetable));
 Reducearrayx=xdist2(xdist2~=0);
 xdist2=Reducearrayx;
-y=flipud(Reducearray);
+% y=flipud(Reducearray);
+y=Reducearray*1
 A1=find(y>redzone);
 TF=isempty(A1)
-x=all(Reducearray<0)& TF==1
+x=all(Reducearray<0)& TF==1;
 FindA1=find(A1==0);
 if (all(Reducearray<0)&& TF==1)
     figure(3)
@@ -178,8 +188,10 @@ else
     xlabel('Distance in x axis(m)')
     ylabel('Reciever level(dB)')
     figure(2)
-    pattern(projArray,fc,-180:180,0,'CoordinateSystem','polar',...
+    pattern(projArray,fc,-180:180,-90,'CoordinateSystem','polar',...
       'PropagationSpeed',Speed);
+  figure(900)
+  pattern(projArray,fc,'CoordinateSystem','polar','Type','directivity');
     figure(56)
     viewArray(projArray,'ShowNormals',true);
     xlabel('Distance in x axis(m)')
