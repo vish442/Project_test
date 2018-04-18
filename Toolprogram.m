@@ -60,7 +60,7 @@ countstep=1;
     
 %     [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed,projector);
     arrayrect=phased.URA('Element',projector,...
- 'Size',[4,4],...
+ 'Size',[10,10],...
  'ElementSpacing',[landa/2 landa/2],...
  'ArrayNormal','z')
     
@@ -76,26 +76,26 @@ countstep=1;
 % steervec=phased.SteeringVector('SensorArray',arrayrect
     
 %radiates the sound projector signal outwards to the far field
-    projRadiator = phased.Radiator('Sensor',arrayect,...                   
+    projRadiator = phased.Radiator('Sensor',arrayrect,...                   
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
     % set a platform for the sound projector
     beaconPlat = phased.Platform('InitialPosition',[10; 10; -5],...   
-     'Velocity',[0; 0; 0]);
+     'Velocity',[0.5; 0; 0]);
  
 %set up Hydrophone with the same frequency range as the sound projector and approiate voltage 
     hydrophone = phased.IsotropicHydrophone('FrequencyRange',[1 100000],...  
      'VoltageSensitivity',VoltageSensitivity);
 
  %   This object models a ULA formed with identical sensor elements.
-    array = phased.ULA('Element',hydrophone,...                             
-    'NumElements',2,'ElementSpacing',Speed/fc/2,...
-    'ArrayAxis','z');
+%     array = phased.ULA('Element',hydrophone,...                             
+%     'NumElements',1,'ElementSpacing',Speed/fc/2,...
+%     'ArrayAxis','z');
 
 phased.ReplicatedSubarray
 
 %collects incident narrowband signals from given directions 
-    arrayCollector = phased.Collector('Sensor',array,...                 
+    arrayCollector = phased.Collector('Sensor',hydrophone,...                 
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
 
 h=waitbar(0,'Program is running...');
@@ -111,7 +111,7 @@ for xcorr=1:forstep:maxdistance
     
     %Transmit pings, pings appear as a peak in the received signals
     numTransmits = 100;
-    rxsig = zeros(size(x,1),2,numTransmits);
+    rxsig = zeros(size(x,1),1,numTransmits);
     for i = 1:numTransmits
 
     % Update array and acoustic beacon positions
