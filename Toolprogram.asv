@@ -60,7 +60,7 @@ countstep=1;
     projector = phased.IsotropicProjector(...                                    
         'FrequencyRange',[1 100000],'VoltageResponse',VoltageResponse,'BackBaffled',false);
     
-%   [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed,projector);
+%     [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed,projector);
     arrayrect=phased.URA('Element',projector,...
  'Size',[2,2],...
  'ElementSpacing',[landa/2 landa/2],...
@@ -81,6 +81,7 @@ countstep=1;
 %radiates the sound projector signal outwards to the far field
     projRadiator = phased.Radiator('Sensor',arrayrect,...                   
     'PropagationSpeed',Speed,'OperatingFrequency',fc,'CombineRadiatedSignals',true);
+% projRadiator.steervec
     % set a platform for the sound projector
     beaconPlat = phased.Platform('InitialPosition',[10; 10; -5],...   
      'Velocity',[0; 0; 0]);
@@ -98,6 +99,9 @@ countstep=1;
 %collects incident narrowband signals from given directions 
     arrayCollector = phased.Collector('Sensor',hydrophone,...                 
     'PropagationSpeed',Speed,'OperatingFrequency',fc);
+
+
+
 
 h=waitbar(0,'Program is running...');
 
