@@ -13,6 +13,7 @@ VoltageResponse=TVR+voltagerms ; %SOURCE LEVEL
 LossFrequencies=1:200;
 VoltageSensitivity=-200;
 maxtime=60;
+timewaited=2
 % VoltageResponse=100;   
 redzone=0
 tot_toc=0
@@ -26,11 +27,12 @@ zcorr=5;
 Speed=1500;
 landa=Speed/fc;
 forstep=1;
-maxdistance=100000;
+maxdistance=15;
 Recievetable=zeros(maxdistance,60);
 xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
 pressuretable=zeros(maxdistance,60);
+SELtable=zeros(maxdistance,60);
 time=zeros(10000,1);
 isopatformx=10
 isopatformy=10
@@ -247,7 +249,72 @@ case 2 %using time for the for loop
     ylabel('Reciever level(dB)')
     'Tool finish'  
     
+    case 3
+for xcorr=11:forstep:maxdistance
+     tic
+    arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
+    'Velocity',[0; 0; 0],'Acceleration',[0;1;0])
+    x = wav(); 
     
+    %Transmit pings, pings appear as a peak in the received signals
+    numTransmits = 1;
+    rxsig = zeros(size(x,1),1,numTransmits);
+    for i = 1:numTransmits
+
+    % Update array and acoustic beacon positions
+    [pos_tx,vel_tx] = beaconPlat(1/prf);
+    [pos_rx,vel_rx] = arrayPlat(1/prf);
+
+    % Compute paths between the acoustic beacon and array, Using the
+    % distance from the platforms and input into the first function of the
+    % underwater properties
+    [paths,dop,aloss,rcvang,srcang] = ...
+     isopath(pos_tx,pos_rx,vel_tx,vel_rx,1/prf);
+
+   % Propagate the acoustic beacon waveform
+    tsig = projRadiator(x,srcang);
+    rsig = channel(tsig,paths,dop,aloss);
+  
+   % Collect the propagated signal
+    rsig = arrayCollector(rsig,rcvang);
+  
+   % Store the received pulses making all voltage values as DC by using
+   % abosoultes
+    rxsig(:,:,i) = abs((rsig));
+ 
+    end
+    
+    Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
+    vdb=20*log10(Vpp); %work out the dB of the voltage signal
+%     energy=trapz(t,rxsig(:,end));
+    Recievelevel=vdb-(VoltageSensitivity); % equation in dB for the voltage sensitivity
+    
+    SEL=Recievelevel+log10(timewaited)
+%     SELcumul=SELtable(countstep)+SEL
+    SELtable(countstep)=SEL % populate array with values
+    xdist2(countstep)=xcorr;
+    
+%     
+    countstep=countstep+1;              %Indexing the array 
+    waitbar(xcorr/maxdistance);
+   
+%     [POS,VEL] = arrayplatform(T)
+    [pos,v] = arrayPlat(T)
+    tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, xcorr, maxdistance-1 )
+ T=T+1
+end        
+       tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, xcorr, maxdistance-1 )
+ T=T+1
+    Reducearray=SELtable(SELtable~=0 & isfinite(SELtable));
+    SELtotal=cumsum(Reducearray)
+    Reducearrayx=xdist2(xdist2~=0);
+    y=Reducearrayx*1;
+    figure(7)
+    plot(y,SELtotal)
+    title(['Cumulative Sound exposure level against distance at ' num2str(fc) 'Hz  '])
+    xlabel('Range meters (m)')
+    ylabel('SEL (dB)')
+    'Tool finish'  
     
     
     
