@@ -8,7 +8,7 @@ Numberofsourcepaths =51;
 BottomLoss=0.5;
 TVR=140%db
 T=1
-voltagerms=100
+voltagerms=55
 VoltageResponse=TVR+voltagerms ; %SOURCE LEVEL
 LossFrequencies=1:200;
 VoltageSensitivity=-200;
@@ -27,7 +27,7 @@ zcorr=5;
 Speed=1500;
 landa=Speed/fc;
 forstep=1;
-maxdistance=15;
+maxdistance=1000;
 Recievetable=zeros(maxdistance,60);
 xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
@@ -250,12 +250,16 @@ case 2 %using time for the for loop
     'Tool finish'  
     
     case 3
-for xcorr=11:forstep:maxdistance
+         xcorr=4
+    ycorr=5
+    zcorr=6
+for T=1:40
      tic
     arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
-    'Velocity',[0; 0; 0],'Acceleration',[0;1;0])
+    'Velocity',[5; 0; 0],'Acceleration',[0;1;0])
     x = wav(); 
-    
+    [pos,v] = arrayPlat(T)
+    [pos,v] = arrayPlat(T)
     %Transmit pings, pings appear as a peak in the received signals
     numTransmits = 1;
     rxsig = zeros(size(x,1),1,numTransmits);
@@ -286,14 +290,17 @@ for xcorr=11:forstep:maxdistance
     
     Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
     vdb=20*log10(Vpp); %work out the dB of the voltage signal
-%     energy=trapz(t,rxsig(:,end));
+    Vppt=Vpp*timewaited
+    20*log10(Vppt)
+    voltage(countstep)=Vppt;
+    
     Recievelevel=vdb-(VoltageSensitivity); % equation in dB for the voltage sensitivity
-    
+    Timeindex=1
     SEL=Recievelevel+log10(timewaited)
-%     SELcumul=SELtable(countstep)+SEL
-    SELtable(countstep)=SEL % populate array with values
-    xdist2(countstep)=xcorr;
-    
+    SELcumul=SELtable(Timeindex)+SEL
+    SELtable(countstep)=SELcumul; % populate array with values
+    timetable(countstep)=T;
+    Timeindex=Timeindex+1
 %     
     countstep=countstep+1;              %Indexing the array 
     waitbar(xcorr/maxdistance);
@@ -310,7 +317,7 @@ end
     Reducearrayx=xdist2(xdist2~=0);
     y=Reducearrayx*1;
     figure(7)
-    plot(y,SELtotal)
+    plot(T,SELtotal)
     title(['Cumulative Sound exposure level against distance at ' num2str(fc) 'Hz  '])
     xlabel('Range meters (m)')
     ylabel('SEL (dB)')
