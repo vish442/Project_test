@@ -4,7 +4,7 @@ n = input('Enter a number: ');
 fc='What is your operating frequency';
 fc=input(fc);
 channelDepth=10;
-Numberofsourcepaths =1;
+Numberofsourcepaths =51;
 BottomLoss=0.5;
 TVR=140%db
 T=1
@@ -105,7 +105,6 @@ h=waitbar(0,'Program is running...');
 switch n
     case 1
 % for ycorr=1:forstep:maxdistance
- 
 for xcorr=11:forstep:maxdistance
      tic
     arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
@@ -163,15 +162,13 @@ case 2 %using time for the for loop
     ycorr=5
     zcorr=6
     
-%   channel.SampleRate = fs; %Update samplerate due to doppler shifts
+  channel.2*SampleRate = fs;
 
-    for T=1:maxtime %Velocity
+    for T=1:maxtime
      tic
-%     arrayPlat= phased.Platform('MotionModel','Acceleration',...
-%           'Acceleration',[1;0;0],'InitialPosition',[xcorr; ycorr; -zcorr],...
-%     'Velocity',[0; 0; 0]);
- arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
-    'Velocity',[5; 0; 0],'Acceleration',[0;1;0])
+    arrayPlat= phased.Platform('MotionModel','Acceleration',...
+          'Acceleration',[1;0;0],'InitialPosition',[xcorr; ycorr; -zcorr],...
+    'Velocity',[0; 0; 0]);
     x = wav(); 
     [pos,v] = arrayPlat(T)
     [pos,v] = arrayPlat(T)
@@ -181,14 +178,14 @@ case 2 %using time for the for loop
     for i = 1:numTransmits
 
     % Update array and acoustic beacon positions
-      [pos_tx,vel_tx] = beaconPlat(1/prf);
-    [pos_rx,vel_rx] = arrayPlat(1/prf);
+    [pos_tx,vel_tx] = beaconPlat(1/prf);
+    [pos,vel_rx] = arrayPlat(1/prf);
 
     % Compute paths between the acoustic beacon and array, Using the
     % distance from the platforms and input into the first function of the
     % underwater properties
     [paths,dop,aloss,rcvang,srcang] = ...
-       isopath(pos_tx,pos_rx,vel_tx,vel_rx,1/prf);
+     isopath(pos_tx,pos,vel_tx,vel_rx,1/prf);
 
    % Propagate the acoustic beacon waveform
     tsig = projRadiator(x,srcang);
@@ -239,7 +236,7 @@ case 2 %using time for the for loop
     ylabel('Reciever level(dB)')
     'Tool finish'  
     
-    case 3 %SEL
+    case 3
          xcorr=4
     ycorr=5
     zcorr=6
@@ -296,7 +293,17 @@ end
     title(['Cumulative Sound exposure level against distance at ' num2str(fc) 'Hz  '])
     xlabel('T (S)')
     ylabel('SEL (dB)')
-    'Tool finish'      
+    'Tool finish'  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
 end  
 
 if n==1
