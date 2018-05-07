@@ -3,18 +3,18 @@ clearvars
 n = input('Enter a number: ');
 fc='What is your operating frequency';
 fc=input(fc);
-channelDepth=10;
-Numberofsourcepaths =1;
-BottomLoss=0.5;
+channelDepth=1000;
+Numberofsourcepaths =51;
+BottomLoss=4.5;
 TVR=140%db
 T=1
-voltagerms=55
+voltagerms=110
 VoltageResponse=TVR+voltagerms ; %SOURCE LEVEL
 LossFrequencies=1:10000;
 VoltageSensitivity=-200;
-maxtime=40;
+maxtime=400;
 % VoltageResponse=100;   
-redzone=0
+redzone=165
 tot_toc=0
 % tic
 % xcorr='Please enter the x cordinate of the receiver';
@@ -26,7 +26,7 @@ zcorr=5;
 Speed=1500;
 landa=Speed/fc;
 forstep=1;
-maxdistance=1000;
+maxdistance=10000;
 Recievetable=zeros(maxdistance,60);
 xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
@@ -35,7 +35,7 @@ SELtable=zeros(maxdistance,60);
 time=zeros(10000,1);
 isopatformx=10
 isopatformy=10
-isopatformz=10
+isopatformz=9
 countstep=1; 
     isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
@@ -66,7 +66,7 @@ countstep=1;
     
 %   [ElementPosition,ElementNormal] = Projectorsetup(3,fc,Speed,projector);
     arrayrect=phased.URA('Element',projector,...
- 'Size',[2,2],...
+ 'Size',[5,5],...
  'ElementSpacing',[landa/2 landa/2],...
  'ArrayNormal','z',...
  'Taper',1)
@@ -82,7 +82,7 @@ countstep=1;
 % % Phas=sPa.SubarraySteering
 
 %radiates the sound projector signal outwards to the far field
-    projRadiator = phased.Radiator('Sensor',projector,...                   
+    projRadiator = phased.Radiator('Sensor',arrayrect,...                   
     'PropagationSpeed',Speed,'OperatingFrequency',fc,'CombineRadiatedSignals',true);
     % set a platform for the sound projector
     beaconPlat = phased.Platform('InitialPosition',[isopatformx; isopatformy; -isopatformz],...   
@@ -159,9 +159,9 @@ for xcorr=11:forstep:maxdistance
 end
 
 case 2 %using time for the for loop
-    xcorr=4
-    ycorr=5
-    zcorr=6
+    xcorr=11
+    ycorr=11
+    zcorr=9
     
 %   channel.SampleRate = fs; %Update samplerate due to doppler shifts
 
@@ -170,8 +170,8 @@ case 2 %using time for the for loop
 %     arrayPlat= phased.Platform('MotionModel','Acceleration',...
 %           'Acceleration',[1;0;0],'InitialPosition',[xcorr; ycorr; -zcorr],...
 %     'Velocity',[0; 0; 0]);
- arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
-    'Velocity',[5; 0; 0],'Acceleration',[0;1;0])
+ arrayPlat= phased.Platform('InitialPosition',[-xcorr; ycorr; -zcorr],...
+    'Velocity',[5; 5; 0],'Acceleration',[0;1;0])
     x = wav(); 
     [pos,v] = arrayPlat(T)
     [pos,v] = arrayPlat(T)
@@ -207,9 +207,9 @@ case 2 %using time for the for loop
     clf
 %     figure(4);
 %     plot(t,rxsig(:,end));
-    title('Reciever Level with distance');
-    xlabel('Time (s)');
-    ylabel('Signal Amplitude (V)')
+%     title('Reciever Level with distance');
+%     xlabel('Time (s)');
+%     ylabel('Signal Amplitude (V)')
     Vpp=peak2peak(rxsig(:,end));  % work out the peak to peak values from the signal
     vdb=20*log10(Vpp); %work out the dB of the voltage signal
     Recievelevel=vdb-(VoltageSensitivity); % equation in dB for the voltage sensitivity
@@ -237,8 +237,49 @@ case 2 %using time for the for loop
     title(['Reciever Level against distance at ' num2str(fc) 'Hz  '])
     xlabel('Range meters (m)')
     ylabel('Reciever level(dB)')
-    'Tool finish'  
     
+    A1=find(y>redzone);
+TF=isempty(A1)
+x=all(Reducearray<0)& TF==1;
+FindA1=find(A1==0);
+if (all(Reducearray<0)&& TF==1)
+    figure(3)
+    plot(Range,y)
+    title(['Reciever Level against distance at ' num2str(fc) 'Hz  '])
+    xlabel('Range meters (m)')
+    ylabel('Reciever level(dB)')
+    'Tool finish'
+    close(h);
+elseif TF==1
+    figure(2)
+    plot(Range,y)
+    title(['Reciever Level against distance at ' num2str(fc) 'Hz  '])
+    xlabel('Range meters (m)')
+    ylabel('Reciever level(dB)')
+    'Tool finish'
+    close(h);
+else    
+    results=y(A1);
+    figure(5)
+    hold on
+    title(['Reciever Level against distance at ' num2str(fc) 'Hz  '])
+    area(Range(1:A1(end)),y(1:A1(end)),'basevalue',0,'FaceColor','r')
+    area(Range(A1(end):end),y(A1(end):end),'basevalue',0,'FaceColor','g')
+    ylim([0 VoltageResponse])
+    xlabel('Range meters (m)')
+    ylabel('Reciever level(dB)')
+    figure(2)
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
+       
+    
+    
+    
+    
+    
+    'Tool finish'  
+end
+
     case 3 %SEL
          xcorr=4
     ycorr=5
@@ -284,18 +325,31 @@ for T=1:maxtime
     waitbar(T/maxtime);
     [pos,v] = arrayPlat(T)
     tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, T, maxtime-1 )
-totalT(countstep)=T
+totalT(countstep)=T    
+    xd=pos(1)-isopatformx;
+    yd=pos(2)-isopatformy;
+    zd=pos(3)-isopatformz;
+    Rangedistance=sqrt((xd*xd)+(yd*yd)+(zd*zd));
+    Range(countstep)=Rangedistance;
+    Positiontable(:,:,T)=pos;
 end        
        tot_toc = DisplayEstimatedTimeOfLoop( tot_toc+toc, T, maxtime-1 ) 
     voltagetotal=cumsum(voltage)
     voltagetotalvpp=20*log10(voltagetotal)
     SELcum=voltagetotalvpp-(VoltageSensitivity)
     time=totalT(totalT~=0);
+    Reducearrayx=Range(Range~=0);
     figure(7)
+    subplot(2,1,1)
     plot(time,SELcum)
+    title(['Cumulative Sound exposure level against time(s) at ' num2str(fc) 'Hz  '])
+    xlabel('Time (s)')
+    ylabel('SEL (dB re \muPa^{2})')
+    subplot(2,1,2)
+     plot(Reducearrayx,SELcum)
     title(['Cumulative Sound exposure level against distance at ' num2str(fc) 'Hz  '])
-    xlabel('T (S)')
-    ylabel('SEL (dB)')
+    xlabel('Range meters (m)')
+    ylabel('SEL (dB re \muPa^{2})')
     'Tool finish'      
 end  
 
@@ -348,8 +402,8 @@ else
       'PropagationSpeed',Speed);
   figure(900)
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
-%     figure(56)
-%     viewArray(sPa,'ShowNormals',true);
+    figure(56)
+    viewArray(arrayrect,'ShowNormals',true);
     xlabel('Distance in x axis(m)')
     ylabel('Reciever level(dB)')
     close(h);
