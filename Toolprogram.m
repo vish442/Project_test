@@ -1,32 +1,27 @@
-clf
+clf                %Clear variables 
 clearvars
-n = input('Enter a number: ');
-fc='What is your operating frequency';
+n = input('Enter a number: ');          %input variable for case
+fc='What is your operating frequency';  %enter operating frequency
 fc=input(fc);
-channelDepth=1000;
-Numberofsourcepaths =51;
-BottomLoss=4.5;
-TVR=140%db
-T=1
-voltagerms=110
-VoltageResponse=TVR+voltagerms ; %SOURCE LEVEL
-LossFrequencies=1:10000;
-VoltageSensitivity=-200;
-maxtime=400;
+channelDepth=1000;                      %enter channel depth
+Numberofsourcepaths =51;                %number of propagtion paths
+BottomLoss=5;                           %Loss due to reflection in dB
+TVR=140                                 %Transmitted voltage response of hydrophone db
+T=1                                     %time index
+voltagerms=110                          %input voltage
+VoltageResponse=TVR+voltagerms ;        %SOURCE LEVEL
+LossFrequencies=1:10000;                %range of frequencies where abosorption loss occurs
+VoltageSensitivity=-200;                %voltage sensentivity of hydrophone
+maxtime=10000;                         %max time for for loop
 % VoltageResponse=100;   
-redzone=165
-tot_toc=0
-% tic
-% xcorr='Please enter the x cordinate of the receiver';
-% xcorr=0;
-% ycorr='Please enter the y cordinate of the receiver';
-ycorr=10;
-% zcorr='Please enter the z cordinate of the receiver';
-zcorr=5;
+redzone=165                             %Colour red zone up to
+tot_toc=0           
+ycorr=10;                               %y coordinate
+zcorr=5;                                %z coordinate of hydrophone
 Speed=1500;
 landa=Speed/fc;
 forstep=1;
-maxdistance=10000;
+maxdistance=1000;
 Recievetable=zeros(maxdistance,60);
 xdist2=zeros(maxdistance,60);
 energytable=zeros(maxdistance,60);
@@ -35,7 +30,7 @@ SELtable=zeros(maxdistance,60);
 time=zeros(10000,1);
 isopatformx=10
 isopatformy=10
-isopatformz=9
+isopatformz=10
 countstep=1; 
     isopath= phased.IsoSpeedUnderwaterPaths(...    %Creates a channel for the propagation 
           'ChannelDepth',channelDepth,...
@@ -106,7 +101,7 @@ switch n
     case 1
 % for ycorr=1:forstep:maxdistance
  
-for xcorr=11:forstep:maxdistance
+for xcorr=5:forstep:maxdistance
      tic
     arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
     'Velocity',[0; 0; 0],'Acceleration',[0;1;0])
@@ -161,7 +156,7 @@ end
 case 2 %using time for the for loop
     xcorr=11
     ycorr=11
-    zcorr=9
+    zcorr=10
     
 %   channel.SampleRate = fs; %Update samplerate due to doppler shifts
 
@@ -171,7 +166,7 @@ case 2 %using time for the for loop
 %           'Acceleration',[1;0;0],'InitialPosition',[xcorr; ycorr; -zcorr],...
 %     'Velocity',[0; 0; 0]);
  arrayPlat= phased.Platform('InitialPosition',[-xcorr; ycorr; -zcorr],...
-    'Velocity',[5; 5; 0],'Acceleration',[0;1;0])
+    'Velocity',[1; 1; 0],'Acceleration',[0;1;0])
     x = wav(); 
     [pos,v] = arrayPlat(T)
     [pos,v] = arrayPlat(T)
@@ -355,13 +350,9 @@ end
 
 if n==1
 clf
-t = (0:length(x)-1)'/fs;
+% t = (0:length(x)-1)'/fs;
     clf
     figure(4)
-    plot(t,rxsig(:,end))
-    title('Reciever Level with distance');
-    xlabel('Time (s)');
-    ylabel('Signal Amplitude (V)')
 Reducearray=Recievetable(Recievetable~=0 & isfinite(Recievetable));
 Reducearrayx=xdist2(xdist2~=0);
 xdist2=Reducearrayx;
