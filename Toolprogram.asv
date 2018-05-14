@@ -245,7 +245,8 @@ if (all(Reducearray<0)&& TF==1)
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
- pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 elseif TF==1
     figure(2)
     plot(Range,y)
@@ -254,7 +255,8 @@ elseif TF==1
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
-   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 else    
     results=y(A1);
     figure(5)
@@ -266,7 +268,8 @@ else
     xlabel('Range meters (m)')
     ylabel('Reciever level(dB)')
     figure(2)
-    pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');   
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed)   
     'Tool finish'  
 end
 
@@ -334,12 +337,12 @@ end
     plot(time,SELcum)
     title(['Cumulative Sound exposure level against time(s) at ' num2str(fc) 'Hz  '])
     xlabel('Time (s)')
-    ylabel('SEL (dB re \muPa^{2}s)')
+    ylabel('SEL (dB re \muPa^{2})')
     subplot(2,1,2)
      plot(Reducearrayx,SELcum)
     title(['Cumulative Sound exposure level against distance at ' num2str(fc) 'Hz  '])
     xlabel('Range meters (m)')
-    ylabel('SEL (dB re \muPa^{2}s)')
+    ylabel('SEL (dB re \muPa^{2})')
     'Tool finish'  
     figure (8)
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
