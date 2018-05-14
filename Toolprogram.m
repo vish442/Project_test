@@ -264,7 +264,7 @@ else
     title(['Reciever Level against distance at ' num2str(fc) 'Hz  '])
     area(Range(1:A1(end)),y(1:A1(end)),'basevalue',0,'FaceColor','r')
     area(Range(A1(end):end),y(A1(end):end),'basevalue',0,'FaceColor','g')
-    ylim([0 VoltageResponse])
+    ylim([100 VoltageResponse])
     xlabel('Range meters (m)')
     ylabel('Reciever level(dB)')
     figure(2)
