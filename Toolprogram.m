@@ -198,7 +198,7 @@ case 2 %using time for the for loop
  
     end
    
-    t = (0:length(x)-1)'/fs;
+%     t = (0:length(x)-1)'/fs;
     clf
 %     figure(4);
 %     plot(t,rxsig(:,end));
@@ -245,6 +245,8 @@ if (all(Reducearray<0)&& TF==1)
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 elseif TF==1
     figure(2)
     plot(Range,y)
@@ -253,6 +255,8 @@ elseif TF==1
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 else    
     results=y(A1);
     figure(5)
@@ -346,6 +350,8 @@ end
     xlabel('Range meters (m)')
     ylabel('SEL (dB re \muPa^{2})')
     'Tool finish'      
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 end  
 
 if n==1
@@ -370,6 +376,8 @@ if (all(Reducearray<0)&& TF==1)
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 elseif TF==1
     figure(2)
     plot(xdist2,y)
@@ -378,6 +386,8 @@ elseif TF==1
     ylabel('Reciever level(dB)')
     'Tool finish'
     close(h);
+    pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
+      'PropagationSpeed',Speed);
 else    
     results=y(A1);
     figure(5)
