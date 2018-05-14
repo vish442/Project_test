@@ -165,8 +165,8 @@ case 2 %using time for the for loop
 %     arrayPlat= phased.Platform('MotionModel','Acceleration',...
 %           'Acceleration',[1;0;0],'InitialPosition',[xcorr; ycorr; -zcorr],...
 %     'Velocity',[0; 0; 0]);
- arrayPlat= phased.Platform('InitialPosition',[-xcorr; ycorr; -zcorr],...
-    'Velocity',[1; 1; 0],'Acceleration',[0;1;0])
+ arrayPlat= phased.Platform('InitialPosition',[xcorr; ycorr; -zcorr],...
+    'Velocity',[1; 1; 0],'Acceleration',[0;0;0])
     x = wav(); 
     [pos,v] = arrayPlat(T)
     [pos,v] = arrayPlat(T)
@@ -246,6 +246,7 @@ if (all(Reducearray<0)&& TF==1)
     'Tool finish'
     close(h);
  pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+ viewArray(arrayrect,'ShowNormals',true);
 elseif TF==1
     figure(2)
     plot(Range,y)
@@ -255,6 +256,7 @@ elseif TF==1
     'Tool finish'
     close(h);
    pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+   viewArray(arrayrect,'ShowNormals',true);
 else    
     results=y(A1);
     figure(5)
@@ -266,7 +268,8 @@ else
     xlabel('Range meters (m)')
     ylabel('Reciever level(dB)')
     figure(2)
-    pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');   
+    pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');  
+    viewArray(arrayrect,'ShowNormals',true);
     'Tool finish'  
 end
 
@@ -343,6 +346,7 @@ end
     'Tool finish'  
     figure (8)
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+  viewArray(arrayrect,'ShowNormals',true);
 end  
 
 if n==1
@@ -370,6 +374,7 @@ if (all(Reducearray<0)&& TF==1)
     pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
       'PropagationSpeed',Speed);
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+  viewArray(arrayrect,'ShowNormals',true);
 elseif TF==1
     figure(2)
     plot(xdist2,y)
@@ -381,6 +386,7 @@ elseif TF==1
     pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
       'PropagationSpeed',Speed);
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
+  viewArray(arrayrect,'ShowNormals',true);
 else    
     results=y(A1);
     figure(5)
@@ -394,6 +400,7 @@ else
     figure(2)
     pattern(arrayrect,fc,-180:180,-90,'CoordinateSystem','polar',...
       'PropagationSpeed',Speed);
+  viewArray(arrayrect,'ShowNormals',true);
   figure(900)
   pattern(arrayrect,fc,'CoordinateSystem','polar','Type','directivity');
     figure(56)
